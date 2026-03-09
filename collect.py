@@ -112,7 +112,8 @@ class CollectResults:
             gp (int): Número do GP.
             mode (str): Tipo da sessão.
         """
-        df.to_parquet(f"data/{year}_{gp:02}_{mode}.parquet")
+        df = df.reset_index(drop=True)
+        df.to_parquet(f"data/{year}_{gp:02}_{mode}.parquet", index=False)
 
     def process(self, year, gp, mode):
         """
@@ -127,6 +128,7 @@ class CollectResults:
         if df.empty:
             return False
         self.save_data(df, year, gp, mode)
+        time.sleep(1)
         return True
 
     def process_year_modes(self, year):
@@ -156,14 +158,23 @@ class CollectResults:
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--start", type=int, default=0)
+    parser.add_argument("--stop", type=int, default=0)
     parser.add_argument("--years", "-y", nargs="+", type=int)
     parser.add_argument("--modes", "-m", nargs="+")
 
     args = parser.parse_args()
 
-    """Cria uma instância da classe CollectResults definindo os anos e tipos de sessão a serem coletados."""
-    Collect = CollectResults(args.years, args.modes)
+    if args.years:
+        years = args.years
 
-    """Executa o processo de coleta e salvamento dos dados para todos os anos definidos."""
+    elif args.start and args.stop:
+        years = list(range(args.start, args.stop + 1))
+
+    else:
+        raise ValueError("Informe --years ou --start e --stop")
+
+    Collect = CollectResults(years, args.modes)
     Collect.process_years()
+
 
