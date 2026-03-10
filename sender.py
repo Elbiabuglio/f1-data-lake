@@ -62,28 +62,30 @@ class Sender:
         return True
     
 
-def process_file(self, folder):
-    """
-    Percorre uma pasta local procurando arquivos no formato .parquet
-    e envia cada um deles para o bucket S3.
+    def process_file(self, folder):
+     """
+         Percorre uma pasta local procurando arquivos no formato .parquet
+        e envia cada um deles para o bucket S3.
 
-    Args:
-        folder (str): Caminho da pasta que contém os arquivos .parquet.
-    """
+        Args:
+            folder (str): Caminho da pasta que contém os arquivos .parquet.
+        """
     files = [i for i in os.listdir(folder) if i.endswith(".parquet")]
     for f in tqdm(files):
         self.process_file(os.path.join(folder, f))
         
-        
-parser = argparse.ArgumentParser()
-parser.add_argument("--bucket", type=str)
-parser.add_argument("--bucket_path",default="f1/results", type=str)
-parser.add_argument("--folder",default="data", type=str)
-args = parser.parse_args()
+ 
+if __name__ == "__main__":
 
-if args.bucket:       
-    send = Sender(args.bucket, args.bucket_path)
-    send.process_folder(args.folder)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bucket", type=str)
+    parser.add_argument("--bucket_path", default="f1/results", type=str)
+    parser.add_argument("--folder", default="data", type=str)
+    args = parser.parse_args()
 
-else:
-    print("sem bucket definido")
+    if args.bucket:
+        send = Sender(args.bucket, args.bucket_path)
+        send.process_folder(args.folder)
+
+    else:
+        print("sem bucket definido")
